@@ -1,26 +1,27 @@
-import { analyzeMedicineImage, translateMedicineAnalysis } from "../services/geminiService.js";
-import Report from "../models/Report.js";
+const { analyzeMedicineImage, translateMedicineAnalysis } = require('../services/geminiService');
+const Report = require('../models/Report');
 
-export const uploadMedicineImage = async (req, res, next) => {
+const uploadMedicineImage = async (req, res, next) => {
   if (!req.file) {
     return res.status(400).json({
       success: false,
-      message: "Please upload an image file using the field name image"
+      message: 'Please upload an image file using the field name image'
     });
   }
 
   try {
-    const language = req.body.language === "Hindi" ? "Hindi" : "English";
-    const originalAnalysisResult = await analyzeMedicineImage(req.file, "English");
-    const displayedResult = language === "English"
+    const language = req.body.language === 'Hindi' ? 'Hindi' : 'English';
+    const originalAnalysisResult = await analyzeMedicineImage(req.file, 'English');
+    const displayedResult = language === 'English'
       ? originalAnalysisResult
       : await translateMedicineAnalysis(originalAnalysisResult, language);
+
     const report = await Report.create({
       user: req.user._id,
       ...displayedResult,
       precautions: displayedResult.precautions ? [displayedResult.precautions] : [],
       sideEffects: displayedResult.sideEffects ? [displayedResult.sideEffects] : [],
-      imageType: "medicine",
+      imageType: 'medicine',
       imageUrl: req.file.filename,
       language,
       originalAnalysisResult,
@@ -41,15 +42,15 @@ export const uploadMedicineImage = async (req, res, next) => {
   }
 };
 
-export const translateMedicineResult = async (req, res, next) => {
+const translateMedicineResult = async (req, res, next) => {
   try {
-    const targetLanguage = req.body.targetLanguage === "Hindi" ? "Hindi" : "English";
+    const targetLanguage = req.body.targetLanguage === 'Hindi' ? 'Hindi' : 'English';
     const analysisResult = req.body.analysisResult;
 
     if (!analysisResult) {
       return res.status(400).json({
         success: false,
-        message: "analysisResult is required"
+        message: 'analysisResult is required'
       });
     }
 
@@ -59,3 +60,5 @@ export const translateMedicineResult = async (req, res, next) => {
     next(error);
   }
 };
+
+module.exports = { uploadMedicineImage, translateMedicineResult };

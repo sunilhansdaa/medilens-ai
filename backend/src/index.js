@@ -7,13 +7,18 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS — update origin after Vercel deploy
+// ✅ CORS fixed with https
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://medilens-ai-two.vercel.app',
+  origin: [
+    'https://medilens-ai-two.vercel.app',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+  ],
   credentials: true
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -25,12 +30,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'MediLens backend is running' });
 });
 
-// ✅ Use process.env.PORT for Render
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGODB_URI)
+// ✅ Fixed: MONGO_URI (matching .env file)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    console.log('MongoDB connected');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    console.log('✅ MongoDB connected successfully');
+    app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
   })
-  .catch(err => console.error('MongoDB error:', err));
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err.message);
+    process.exit(1);
+  });

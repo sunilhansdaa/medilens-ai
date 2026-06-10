@@ -1,0 +1,11 @@
+[33m2aa0e78[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Changed:import/export to require
+[33m066ca91[m[33m ([m[1;31morigin/main[m[33m)[m Added file vercel.json
+[33mda2c54f[m Fixed: index.js frontend url
+[33m1c70ffc[m URL: Fixed in api.js
+[33m9912775[m MediLens AI frontend - initial deployment
+[33m03ae67a[m modified:add .log in .gitignore
+[33m0ea0eea[m fix: add type module in package.json
+[33m13589df[m fix: removed type module from package.json
+[33mf2cb9f9[m rearrange file
+[33m440fbb4[m file modified
+[33maa8ccb8[m MediLens AI fresh commit

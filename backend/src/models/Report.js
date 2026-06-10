@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const reportSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
       index: true
     },
@@ -34,8 +34,8 @@ const reportSchema = new mongoose.Schema(
     },
     imageType: {
       type: String,
-      enum: ["medicine", "prescription"],
-      default: "medicine"
+      enum: ['medicine', 'prescription'],
+      default: 'medicine'
     },
     imageUrl: {
       type: String,
@@ -43,29 +43,29 @@ const reportSchema = new mongoose.Schema(
     },
     language: {
       type: String,
-      enum: ["English", "Hindi"],
-      default: "English"
+      enum: ['English', 'Hindi'],
+      default: 'English'
     },
     originalAnalysisResult: {
-      medicineName: { type: String, trim: true, default: "" },
-      use: { type: String, trim: true, default: "" },
-      dosage: { type: String, trim: true, default: "" },
-      precautions: { type: String, trim: true, default: "" },
-      sideEffects: { type: String, trim: true, default: "" },
-      doctorAdvice: { type: String, trim: true, default: "" }
+      medicineName: { type: String, trim: true, default: '' },
+      use: { type: String, trim: true, default: '' },
+      dosage: { type: String, trim: true, default: '' },
+      precautions: { type: String, trim: true, default: '' },
+      sideEffects: { type: String, trim: true, default: '' },
+      doctorAdvice: { type: String, trim: true, default: '' }
     },
     displayedResult: {
-      medicineName: { type: String, trim: true, default: "" },
-      use: { type: String, trim: true, default: "" },
-      dosage: { type: String, trim: true, default: "" },
-      precautions: { type: String, trim: true, default: "" },
-      sideEffects: { type: String, trim: true, default: "" },
-      doctorAdvice: { type: String, trim: true, default: "" }
+      medicineName: { type: String, trim: true, default: '' },
+      use: { type: String, trim: true, default: '' },
+      dosage: { type: String, trim: true, default: '' },
+      precautions: { type: String, trim: true, default: '' },
+      sideEffects: { type: String, trim: true, default: '' },
+      doctorAdvice: { type: String, trim: true, default: '' }
     },
     selectedLanguage: {
       type: String,
-      enum: ["English", "Hindi"],
-      default: "English"
+      enum: ['English', 'Hindi'],
+      default: 'English'
     }
   },
   {
@@ -73,6 +73,6 @@ const reportSchema = new mongoose.Schema(
   }
 );
 
-const Report = mongoose.model("Report", reportSchema);
+const Report = mongoose.model('Report', reportSchema);
 
-export default Report;
+module.exports = Report;

@@ -1,5 +1,5 @@
-import fs from "fs/promises";
-import { GoogleGenAI } from "@google/genai";
+const fs = require("fs/promises");
+const { GoogleGenAI } = require("@google/genai");
 
 const emptyMedicineResponse = {
   medicineName: "",
@@ -63,19 +63,31 @@ const parseGeminiJson = (text) => {
 const createGeminiError = (error) => {
   const message = error?.message || "";
 
-  if (message.includes("API key not valid") || message.includes("API_KEY_INVALID")) {
-    const apiKeyError = new Error("Gemini API key is invalid. Please check backend .env and restart the server.");
+  if (
+    message.includes("API key not valid") ||
+    message.includes("API_KEY_INVALID")
+  ) {
+    const apiKeyError = new Error(
+      "Gemini API key is invalid. Please check backend .env and restart the server."
+    );
     apiKeyError.statusCode = 502;
     return apiKeyError;
   }
 
-  if (message.includes("quota") || message.includes("RESOURCE_EXHAUSTED")) {
-    const quotaError = new Error("Gemini quota limit reached. Please try again later or check your Google AI Studio quota.");
+  if (
+    message.includes("quota") ||
+    message.includes("RESOURCE_EXHAUSTED")
+  ) {
+    const quotaError = new Error(
+      "Gemini quota limit reached. Please try again later or check your Google AI Studio quota."
+    );
     quotaError.statusCode = 429;
     return quotaError;
   }
 
-  const fallbackError = new Error("AI analysis failed. Please try again with a clearer image.");
+  const fallbackError = new Error(
+    "AI analysis failed. Please try again with a clearer image."
+  );
   fallbackError.statusCode = 502;
   return fallbackError;
 };
@@ -93,11 +105,16 @@ const normalizeMedicineResponse = (data) => ({
   doctorAdvice: data.doctorAdvice || ""
 });
 
-const getTranslationPrompt = (analysisResult, targetLanguage) => `
+const getTranslationPrompt = (
+  analysisResult,
+  targetLanguage
+) => `
 You are MediLens AI.
-${targetLanguage === "Hindi"
-  ? "Translate the medicine analysis into simple, natural Hindi. Do not translate medicine brand names. Keep dosage numbers and units unchanged. Use clear Hindi suitable for common users. Do not use awkward machine translation. Do not add extra medical claims."
-  : "Translate only the JSON values into simple English."}
+${
+  targetLanguage === "Hindi"
+    ? "Translate the medicine analysis into simple, natural Hindi. Do not translate medicine brand names. Keep dosage numbers and units unchanged. Use clear Hindi suitable for common users. Do not use awkward machine translation. Do not add extra medical claims."
+    : "Translate only the JSON values into simple English."
+}
 Keep the JSON keys exactly in English.
 Do not add markdown, code fences, or extra text.
 
@@ -115,9 +132,14 @@ JSON to translate:
 ${JSON.stringify(normalizeMedicineResponse(analysisResult))}
 `;
 
-export const analyzeMedicineImage = async (file, language = "English") => {
+const analyzeMedicineImage = async (
+  file,
+  language = "English"
+) => {
   if (!process.env.GEMINI_API_KEY) {
-    const error = new Error("GEMINI_API_KEY is missing in environment variables");
+    const error = new Error(
+      "GEMINI_API_KEY is missing in environment variables"
+    );
     error.statusCode = 500;
     throw error;
   }
@@ -160,15 +182,21 @@ export const analyzeMedicineImage = async (file, language = "English") => {
   }
 };
 
-export const translateMedicineAnalysis = async (analysisResult, targetLanguage = "English") => {
-  const normalizedResult = normalizeMedicineResponse(analysisResult);
+const translateMedicineAnalysis = async (
+  analysisResult,
+  targetLanguage = "English"
+) => {
+  const normalizedResult =
+    normalizeMedicineResponse(analysisResult);
 
   if (targetLanguage === "English") {
     return normalizedResult;
   }
 
   if (!process.env.GEMINI_API_KEY) {
-    const error = new Error("GEMINI_API_KEY is missing in environment variables");
+    const error = new Error(
+      "GEMINI_API_KEY is missing in environment variables"
+    );
     error.statusCode = 500;
     throw error;
   }
@@ -182,7 +210,10 @@ export const translateMedicineAnalysis = async (analysisResult, targetLanguage =
       model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
       contents: [
         {
-          text: getTranslationPrompt(normalizedResult, targetLanguage)
+          text: getTranslationPrompt(
+            normalizedResult,
+            targetLanguage
+          )
         }
       ],
       config: {
@@ -194,8 +225,15 @@ export const translateMedicineAnalysis = async (analysisResult, targetLanguage =
       return normalizedResult;
     }
 
-    return normalizeMedicineResponse(parseGeminiJson(response.text));
+    return normalizeMedicineResponse(
+      parseGeminiJson(response.text)
+    );
   } catch (error) {
     throw createGeminiError(error);
   }
+};
+
+module.exports = {
+  analyzeMedicineImage,
+  translateMedicineAnalysis
 };

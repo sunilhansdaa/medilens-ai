@@ -1,19 +1,19 @@
-import express from "express";
-import {
+const express = require('express');
+const {
   createReport,
   deleteReport,
   getReports,
   getReportById
-} from "../controllers/reportController.js";
-import { protect } from "../middleware/authMiddleware.js";
+} = require('../controllers/reportController');
+const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
 router.use(protect);
 
-router.get("/", getReports);
-router.get("/:id", getReportById);
-router.post("/", createReport);
-router.delete("/:id", deleteReport);
+router.get('/', getReports);
+router.get('/:id', getReportById);
+router.post('/', createReport);
+router.delete('/:id', deleteReport);
 
-export default router;
+module.exports = router;
