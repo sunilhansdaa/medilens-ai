@@ -1,24 +1,23 @@
-import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
-import healthRoutes from "./routes/healthRoutes.js";
-import reportRoutes from "./routes/reportRoutes.js";
-import medicineRoutes from "./routes/medicineRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
-import { getProfile } from "./controllers/authController.js";
-import { protect } from "./middleware/authMiddleware.js";
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const dotenv = require("dotenv");
+const path = require("path");
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const healthRoutes = require("./routes/healthRoutes");
+const reportRoutes = require("./routes/reportRoutes");
+const medicineRoutes = require("./routes/medicineRoutes");
+const authRoutes = require("./routes/authRoutes");
+
+const { getProfile } = require("./controllers/authController");
+const { protect } = require("./middleware/authMiddleware");
 
 dotenv.config({
   path: path.resolve(__dirname, "../.env")
 });
 
 const app = express();
+
 const allowedOrigins = [
   process.env.CLIENT_URL || "http://127.0.0.1:5173",
   "http://localhost:5173",
@@ -40,8 +39,18 @@ app.use(
 );
 
 app.use(bodyParser.json({ limit: "10mb" }));
-app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
-app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
+
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: "10mb"
+  })
+);
+
+app.use(
+  "/uploads",
+  express.static(path.resolve(__dirname, "../uploads"))
+);
 
 app.get("/", (req, res) => {
   res.json({
@@ -51,10 +60,15 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/health", healthRoutes);
+
 app.use("/api/auth", authRoutes);
+
 app.use("/api/reports", reportRoutes);
+
 app.use("/api/history", reportRoutes);
+
 app.get("/api/profile", protect, getProfile);
+
 app.use("/api/medicine", medicineRoutes);
 
 app.use((req, res) => {
@@ -67,10 +81,11 @@ app.use((req, res) => {
 app.use((error, req, res, next) => {
   res.status(error.statusCode || 500).json({
     success: false,
-    message: error.code === 11000
-      ? "Duplicate value already exists"
-      : error.message || "Internal server error"
+    message:
+      error.code === 11000
+        ? "Duplicate value already exists"
+        : error.message || "Internal server error"
   });
 });
 
-export default app;
+module.exports = app;
